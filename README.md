@@ -1,22 +1,24 @@
-# Node Boilerplate
+# Estore API
 
-A minimal Node.js API boilerplate using Express, Sequelize, and environment-based database
-configuration.
+A Node.js REST API built with Express, Sequelize, and PostgreSQL. The app is organized into routes,
+controllers, services, repositories, and Sequelize models.
 
 ## Features
 
-- Express app setup
+- Express 5 API server
 - JSON request parsing
 - Health check endpoint
-- Sequelize configuration
-- Sequelize CLI migration/model scripts
-- Environment variable support with `dotenv`
+- User CRUD endpoints
+- Sequelize model loading
+- PostgreSQL support through `pg` and `pg-hstore`
+- Environment-based configuration with `dotenv`
+- Sequelize CLI scripts for migrations and model generation
 
 ## Requirements
 
-- Node.js
+- Node.js 20 or newer
 - npm
-- A SQL database supported by Sequelize
+- PostgreSQL
 
 ## Getting Started
 
@@ -32,13 +34,13 @@ Create your environment file:
 cp .env.example .env
 ```
 
-Update `.env` with your local database credentials:
+Update `.env` with your local database values:
 
 ```env
 DB_NAME=node_boilerplate
-DB_USER=
+DB_USER=postgres
 DB_PASSWORD=
-DB_HOST=
+DB_HOST=localhost
 DB_DIALECT=postgres
 DB_PORT=5432
 PORT=8080
@@ -56,53 +58,57 @@ Start the production server:
 npm start
 ```
 
-By default, the server uses `PORT` from `.env`, or falls back to `4000`.
+The server uses `PORT` from `.env`, or falls back to `4000`.
 
-## Health Check
+## API
 
-Once the server is running, check:
+Base API path:
+
+```text
+/api/v1
+```
+
+Health check:
 
 ```http
 GET /health
 ```
 
-Example response:
+User routes:
+
+```http
+GET    /api/v1/users
+POST   /api/v1/users
+GET    /api/v1/users/:id
+PATCH  /api/v1/users/:id
+DELETE /api/v1/users/:id
+```
+
+Example user payload:
 
 ```json
 {
-  "uptime": 12.34,
-  "message": "OK",
-  "timestamp": 1760000000000
+  "firstName": "Saroar",
+  "lastName": "Shahan",
+  "userName": "saroar",
+  "email": "saroar@example.com",
+  "password": "secret",
+  "status": "active"
 }
 ```
 
+`status` can be `active`, `inactive`, or `blocked`.
+
 ## Database
 
-Database settings are loaded from `.env` in:
+Runtime database connection settings are loaded from:
 
 - `src/config/db.js`
 - `src/config/config.js`
 
-The project currently includes the `pg` and `pg-hstore` packages for PostgreSQL. If you use
-`DB_DIALECT=mysql`, install the MySQL driver too:
-
-```bash
-npm install mysql2
-```
-
-For PostgreSQL, set:
-
-```env
-DB_DIALECT=postgres
-DB_PORT=5432
-```
-
-For MySQL, set:
-
-```env
-DB_DIALECT=mysql
-DB_PORT=3306
-```
+The `UserModel` maps to the `users` table and uses underscored timestamp columns. Soft deletes are
+enabled with Sequelize `paranoid`, so deleted rows use a `deleted_at` timestamp instead of being
+removed immediately.
 
 ## Sequelize Commands
 
@@ -140,18 +146,25 @@ npm run model:gen -- User --attributes name:string,email:string
 
 ```text
 .
-├── .vscode/
-├── migrations/
 ├── src/
+│   ├── Index.js
 │   ├── app.js
+│   ├── server.js
 │   ├── config/
 │   │   ├── config.js
 │   │   └── db.js
+│   ├── controllers/
+│   │   └── UserController.js
 │   ├── models/
+│   │   ├── UserModel.js
 │   │   └── index.js
+│   ├── repository/
+│   │   └── UserRepository.js
 │   ├── routes/
+│   │   ├── UserRoutes.js
 │   │   └── index.js
-│   └── server.js
+│   └── services/
+│       └── UserServices.js
 ├── .env.example
 ├── .sequelizerc
 ├── package.json
