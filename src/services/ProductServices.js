@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { ProductRepository } = require('../repository/ProductRepository');
 const { limitAndOffsetBuilder } = require('./../utils');
 const { SupplierModel, CategoryModel } = require('../models');
@@ -12,7 +13,7 @@ class ProductServices {
 
   async getAllProducts(req) {
     const options = {};
-    const { page } = req.query;
+    const { page, minPrice, maxPrice } = req.query;
     const { limit, offset } = limitAndOffsetBuilder(req.query);
 
     if (req.query.categoryId) {
@@ -21,6 +22,16 @@ class ProductServices {
 
     if (req.query.supplierId) {
       options.where = { ...options.where, supplierId: req.query.supplierId };
+    }
+
+    if (minPrice || maxPrice) {
+      options.where = {
+        ...options.where,
+        price: {
+          ...(minPrice && { [Op.gte]: minPrice }),
+          ...(maxPrice && { [Op.lte]: maxPrice }),
+        },
+      };
     }
 
     if (req.query.sortBy && req.query.orderBy) {
