@@ -11,8 +11,8 @@ class SupplierRepository {
     return SupplierModel.create(data);
   }
 
-  async findAll() {
-    return SupplierModel.findAll();
+  async findAndCountAll(options) {
+    return SupplierModel.findAndCountAll(options);
   }
 
   async findById(id) {

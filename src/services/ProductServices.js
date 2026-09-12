@@ -15,7 +15,6 @@ class ProductServices {
     const { page } = req.query;
     const { limit, offset } = limitAndOffsetBuilder(req.query);
 
-    // Implement filtering, sorting, and pagination based on query parameters
     if (req.query.categoryId) {
       options.where = { ...options.where, categoryId: req.query.categoryId };
     }

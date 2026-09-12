@@ -11,8 +11,8 @@ class CategoryRepository {
     return CategoryModel.create(data);
   }
 
-  async findAll() {
-    return CategoryModel.findAll();
+  async findAndCountAll(options) {
+    return CategoryModel.findAndCountAll(options);
   }
 
   async findById(id) {

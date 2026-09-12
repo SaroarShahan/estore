@@ -9,12 +9,12 @@ class SupplierController {
 
   async getAllSuppliers(req, res, next) {
     try {
-      const suppliers = await supplierServices.getAllSuppliers();
+      const suppliers = await supplierServices.getAllSuppliers(req);
 
       res.status(200).json({
         status: true,
         message: 'Fetched all suppliers successfully',
-        suppliers: suppliers,
+        data: suppliers,
       });
     } catch (error) {
       next(error);

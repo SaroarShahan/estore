@@ -9,12 +9,12 @@ class UserController {
 
   async getAllUsers(req, res, next) {
     try {
-      const users = await userServices.getAllUsers();
+      const users = await userServices.getAllUsers(req);
 
       res.status(200).json({
         status: true,
         message: 'Fetched all users successfully',
-        users: users,
+        data: users,
       });
     } catch (error) {
       next(error);

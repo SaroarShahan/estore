@@ -9,12 +9,12 @@ class CategoryController {
 
   async getAllCategories(req, res, next) {
     try {
-      const categories = await categoryServices.getAllCategories();
+      const categories = await categoryServices.getAllCategories(req);
 
       res.status(200).json({
         status: true,
         message: 'Fetched all categories successfully',
-        categories: categories,
+        data: categories,
       });
     } catch (error) {
       next(error);

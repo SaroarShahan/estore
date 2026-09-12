@@ -11,8 +11,8 @@ class UserRepository {
     return UserModel.create(data);
   }
 
-  async findAll() {
-    return UserModel.findAll();
+  async findAndCountAll(options) {
+    return UserModel.findAndCountAll(options);
   }
 
   async findById(id) {
