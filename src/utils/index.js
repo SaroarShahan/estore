@@ -13,4 +13,6 @@ const limitAndOffsetBuilder = (query) => {
   };
 };
 
-module.exports = { limitAndOffsetBuilder };
+const { logger } = require('./logger');
+
+module.exports = { limitAndOffsetBuilder, logger };

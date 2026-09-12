@@ -1,4 +1,6 @@
 const { CategoryServices } = require('../services/CategoryServices');
+const { loggerContexts } = require('../constants/loggerContexts');
+const { logger } = require('../utils');
 
 const categoryServices = new CategoryServices();
 
@@ -9,6 +11,11 @@ class CategoryController {
 
   async getAllCategories(req, res, next) {
     try {
+      logger.info({
+        message: 'Start executing method',
+        context: loggerContexts.getAllCategories,
+      });
+
       const categories = await categoryServices.getAllCategories(req);
 
       res.status(200).json({
@@ -17,12 +24,21 @@ class CategoryController {
         data: categories,
       });
     } catch (error) {
+      logger.error({
+        error,
+        context: loggerContexts.getAllCategories,
+      });
       next(error);
     }
   }
 
   async getCategory(req, res, next) {
     try {
+      logger.info({
+        message: 'Start executing method',
+        context: loggerContexts.getCategory,
+      });
+
       const category = await categoryServices.getCategory(req.params.id);
 
       if (!category) {
@@ -35,12 +51,26 @@ class CategoryController {
         category: category,
       });
     } catch (error) {
+      logger.error({
+        error,
+        context: loggerContexts.getCategory,
+      });
       next(error);
     }
   }
 
   async createCategory(req, res, next) {
     try {
+      logger.info({
+        message: 'Start executing method',
+        context: loggerContexts.createCategory,
+      });
+      logger.info({
+        message: 'Create Category Req Body',
+        context: loggerContexts.createCategory,
+        data: req.body,
+      });
+
       const newCategory = await categoryServices.createCategory(req.body);
 
       res.status(201).json({
@@ -49,12 +79,26 @@ class CategoryController {
         category: newCategory,
       });
     } catch (error) {
+      logger.error({
+        error,
+        context: loggerContexts.createCategory,
+      });
       next(error);
     }
   }
 
   async updateCategory(req, res, next) {
     try {
+      logger.info({
+        message: 'Start executing method',
+        context: loggerContexts.updateCategory,
+      });
+      logger.info({
+        message: 'Update Category Req Body',
+        context: loggerContexts.updateCategory,
+        data: req.body,
+      });
+
       const updatedCategory = await categoryServices.updateCategory(req.params.id, req.body);
 
       if (!updatedCategory) {
@@ -67,12 +111,21 @@ class CategoryController {
         category: updatedCategory,
       });
     } catch (error) {
+      logger.error({
+        error,
+        context: loggerContexts.updateCategory,
+      });
       next(error);
     }
   }
 
   async deleteCategory(req, res, next) {
     try {
+      logger.info({
+        message: 'Start executing method',
+        context: loggerContexts.deleteCategory,
+      });
+
       const deletedCategory = await categoryServices.deleteCategory(req.params.id);
 
       if (!deletedCategory) {
@@ -84,6 +137,10 @@ class CategoryController {
         message: 'Category deleted successfully',
       });
     } catch (error) {
+      logger.error({
+        error,
+        context: loggerContexts.deleteCategory,
+      });
       next(error);
     }
   }

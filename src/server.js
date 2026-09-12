@@ -3,6 +3,8 @@ const http = require('http');
 
 const { App } = require('./app');
 const sequelize = require('./config/db');
+const { loggerContexts } = require('./constants/loggerContexts');
+const { logger } = require('./utils');
 
 dotenv.config();
 
@@ -14,9 +16,9 @@ const server = http.createServer(application);
 
 const listen = () => {
   server.listen(PORT, () => {
-    console.info({
+    logger.info({
       message: 'Estore API is running',
-      context: listen.name,
+      context: loggerContexts.listen,
       data: {
         ip: HOST,
         port: PORT,
@@ -27,15 +29,15 @@ const listen = () => {
 };
 
 const stopServer = () => {
-  console.info({
+  logger.info({
     message: 'Stopping server',
-    context: stopServer.name,
+    context: loggerContexts.stopServer,
   });
 
   server.close(() => {
-    console.info({
+    logger.info({
       message: 'Estore API is stopped',
-      context: stopServer.name,
+      context: loggerContexts.stopServer,
       data: {
         ip: HOST,
         port: PORT,
@@ -45,24 +47,24 @@ const stopServer = () => {
 };
 
 const startServer = () => {
-  console.info({
+  logger.info({
     message: 'Starting DB server',
-    context: startServer.name,
+    context: loggerContexts.startServer,
   });
 
   sequelize
     .authenticate()
     .then(() => {
-      console.info({
+      logger.info({
         message: 'Database connected',
-        context: startServer.name,
+        context: loggerContexts.startServer,
       });
       listen();
     })
     .catch((error) => {
-      console.error({
+      logger.error({
         error,
-        context: startServer.name,
+        context: loggerContexts.startServer,
       });
       process.exit(1);
     });

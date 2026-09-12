@@ -1,4 +1,6 @@
 const { startServer, stopServer } = require('./server');
+const { loggerContexts } = require('./constants/loggerContexts');
+const { logger } = require('./utils');
 
 startServer();
 
@@ -7,9 +9,9 @@ if (process.env.IS_LOCAL !== 'true') {
 }
 
 process.on('uncaughtException', (err) => {
-  console.error({
+  logger.error({
     message: 'Uncaught Exception',
-    context: 'process',
+    context: loggerContexts.process,
     data: {
       error: err.message,
       stack: err.stack,
@@ -18,9 +20,9 @@ process.on('uncaughtException', (err) => {
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error({
+  logger.error({
     message: 'Unhandled Rejection',
-    context: 'process',
+    context: loggerContexts.process,
     data: {
       promise,
       reason,
