@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   UserModel.init(
     {
       id: {
-        type: DataTypes.BIGINT.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+
+        validate: {
+          isEmail: true,
+        },
       },
       password: {
         type: DataTypes.STRING,
