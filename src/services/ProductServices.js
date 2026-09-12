@@ -30,6 +30,10 @@ class ProductServices {
       options.order = [[field, order.toUpperCase()]];
     }
 
+    if (typeof req.query.isActive !== 'undefined') {
+      options.where = { ...options.where, isActive: req.query.isActive === 'true' };
+    }
+
     const { rows, count } = await this.productRepository.findAndCountAll({
       include: [
         { model: SupplierModel, as: 'supplier' },
