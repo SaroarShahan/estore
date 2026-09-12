@@ -1,0 +1,28 @@
+const loggerContexts = {
+  process: 'process',
+  listen: 'listen',
+  startServer: 'startServer',
+  stopServer: 'stopServer',
+  getAllUsers: 'UserController.getAllUsers',
+  getUser: 'UserController.getUser',
+  createUser: 'UserController.createUser',
+  updateUser: 'UserController.updateUser',
+  deleteUser: 'UserController.deleteUser',
+  getAllCategories: 'CategoryController.getAllCategories',
+  getCategory: 'CategoryController.getCategory',
+  createCategory: 'CategoryController.createCategory',
+  updateCategory: 'CategoryController.updateCategory',
+  deleteCategory: 'CategoryController.deleteCategory',
+  getAllProducts: 'ProductController.getAllProducts',
+  getProduct: 'ProductController.getProduct',
+  createProduct: 'ProductController.createProduct',
+  updateProduct: 'ProductController.updateProduct',
+  deleteProduct: 'ProductController.deleteProduct',
+  getAllSuppliers: 'SupplierController.getAllSuppliers',
+  getSupplier: 'SupplierController.getSupplier',
+  createSupplier: 'SupplierController.createSupplier',
+  updateSupplier: 'SupplierController.updateSupplier',
+  deleteSupplier: 'SupplierController.deleteSupplier',
+};
+
+module.exports = { loggerContexts };
