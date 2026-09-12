@@ -57,8 +57,8 @@ class ProductServices {
 
     const { rows, count } = await this.productRepository.findAndCountAll({
       include: [
-        { model: SupplierModel, as: 'supplier' },
-        { model: CategoryModel, as: 'category' },
+        { model: SupplierModel, as: 'supplier', attributes: ['id', 'name'] },
+        { model: CategoryModel, as: 'category', attributes: ['id', 'name'] },
       ],
       where: options.where || {},
       limit,
