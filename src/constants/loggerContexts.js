@@ -23,6 +23,16 @@ const loggerContexts = {
   createSupplier: 'SupplierController.createSupplier',
   updateSupplier: 'SupplierController.updateSupplier',
   deleteSupplier: 'SupplierController.deleteSupplier',
+  getAllCustomers: 'CustomerController.getAllCustomers',
+  getCustomer: 'CustomerController.getCustomer',
+  createCustomer: 'CustomerController.createCustomer',
+  updateCustomer: 'CustomerController.updateCustomer',
+  deleteCustomer: 'CustomerController.deleteCustomer',
+  getAllOrders: 'OrderController.getAllOrders',
+  getOrder: 'OrderController.getOrder',
+  createOrder: 'OrderController.createOrder',
+  updateOrder: 'OrderController.updateOrder',
+  deleteOrder: 'OrderController.deleteOrder',
 };
 
 module.exports = { loggerContexts };
