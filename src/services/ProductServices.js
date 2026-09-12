@@ -44,6 +44,17 @@ class ProductServices {
       options.where = { ...options.where, isActive: req.query.isActive === 'true' };
     }
 
+    if (req.query.search) {
+      const searchTerm = req.query.search;
+      options.where = {
+        ...options.where,
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${searchTerm}%` } },
+          { sku: { [Op.iLike]: `%${searchTerm}%` } },
+        ],
+      };
+    }
+
     const { rows, count } = await this.productRepository.findAndCountAll({
       include: [
         { model: SupplierModel, as: 'supplier' },
