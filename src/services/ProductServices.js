@@ -1,4 +1,6 @@
 const { ProductRepository } = require('../repository/ProductRepository');
+const { limitAndOffsetBuilder } = require('./../utils');
+const { SupplierModel, CategoryModel } = require('../models');
 
 class ProductServices {
   constructor() {
@@ -8,8 +10,44 @@ class ProductServices {
     ProductServices.instance = this;
   }
 
-  async getAllProducts() {
-    return await this.productRepository.findAll();
+  async getAllProducts(req) {
+    const options = {};
+    const { page } = req.query;
+    const { limit, offset } = limitAndOffsetBuilder(req.query);
+
+    // Implement filtering, sorting, and pagination based on query parameters
+    if (req.query.categoryId) {
+      options.where = { ...options.where, categoryId: req.query.categoryId };
+    }
+
+    if (req.query.supplierId) {
+      options.where = { ...options.where, supplierId: req.query.supplierId };
+    }
+
+    if (req.query.sortBy && req.query.orderBy) {
+      const field = req.query.sortBy;
+      const order = req.query.orderBy;
+      options.order = [[field, order.toUpperCase()]];
+    }
+
+    const { rows, count } = await this.productRepository.findAndCountAll({
+      include: [
+        { model: SupplierModel, as: 'supplier' },
+        { model: CategoryModel, as: 'category' },
+      ],
+      where: options.where || {},
+      limit,
+      offset,
+      order: options.order || [['created_at', 'desc']],
+    });
+
+    return {
+      totalCount: count,
+      products: rows,
+      page: page ? +page : 1,
+      limit: limit ? +limit : count,
+      totalPage: limit ? Math.ceil(count / +limit) : 1,
+    };
   }
 
   async getProduct(id) {

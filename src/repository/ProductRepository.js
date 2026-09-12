@@ -11,8 +11,8 @@ class ProductRepository {
     return ProductModel.create(data);
   }
 
-  async findAll() {
-    return ProductModel.findAll();
+  async findAndCountAll(options) {
+    return ProductModel.findAndCountAll(options);
   }
 
   async findById(id) {

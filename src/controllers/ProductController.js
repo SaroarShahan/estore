@@ -9,12 +9,12 @@ class ProductController {
 
   async getAllProducts(req, res, next) {
     try {
-      const products = await productServices.getAllProducts();
+      const products = await productServices.getAllProducts(req);
 
       res.status(200).json({
         status: true,
         message: 'Fetched all products successfully',
-        products: products,
+        data: products,
       });
     } catch (error) {
       next(error);
