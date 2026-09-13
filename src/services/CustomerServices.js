@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { CustomerRepository } = require('../repository/CustomerRepository');
 const { limitAndOffsetBuilder } = require('./../utils');
+const { OrderModel, OrderItemModel, ProductModel, CategoryModel } = require('../models');
 
 class CustomerServices {
   constructor() {
@@ -35,6 +36,38 @@ class CustomerServices {
     }
 
     const { rows, count } = await this.customerRepository.findAndCountAll({
+      attributes: ['id', 'name', 'email', 'phone', 'address'],
+      include: [
+        {
+          model: OrderModel,
+          as: 'orders',
+          attributes: ['id', 'totalAmount', 'status', 'createdAt'],
+          include: [
+            {
+              model: OrderItemModel,
+              as: 'items',
+              attributes: ['id', 'quantity', 'unitPrice', 'subtotal'],
+              include: [
+                {
+                  model: ProductModel,
+                  as: 'product',
+                  attributes: ['id', 'name', 'sku', 'price'],
+                  include: [
+                    {
+                      model: CategoryModel,
+                      as: 'category',
+                      attributes: ['id', 'name'],
+                      where: {
+                        name: 'Electronics',
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
       where: options.where || {},
       limit,
       offset,
