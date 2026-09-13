@@ -2,6 +2,7 @@ const { OrderServices } = require('../services/OrderServices');
 const { loggerContexts } = require('../constants/loggerContexts');
 const { logger } = require('../utils');
 const BaseController = require('../utils/BaseController');
+const { ResponseMessage } = require('../utils/ResponseMessage');
 
 const orderServices = new OrderServices();
 
@@ -19,12 +20,13 @@ class OrderController extends BaseController {
       });
 
       const orders = await orderServices.getAllOrders(req);
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched all orders successfully',
-        data: orders,
-      });
+      const responseObj = new ResponseMessage();
+      if (orders) {
+        responseObj.data = orders;
+        responseObj.httpStatusCode = 200;
+        responseObj.message = 'Fetched all orders successfully';
+      }
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({ error, context: loggerContexts.getAllOrders });
       next(error);
@@ -36,16 +38,11 @@ class OrderController extends BaseController {
       logger.info({ message: 'Start executing method', context: loggerContexts.getOrder });
 
       const order = await orderServices.getOrder(req.params.id);
-
-      if (!order) {
-        return res.status(404).json({ message: 'Order not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched order successfully',
-        order,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = order || {};
+      responseObj.httpStatusCode = order ? 200 : 404;
+      responseObj.message = order ? 'Fetched order successfully' : 'Order not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({ error, context: loggerContexts.getOrder });
       next(error);
@@ -62,12 +59,11 @@ class OrderController extends BaseController {
       });
 
       const newOrder = await orderServices.createOrder(req.body);
-
-      res.status(201).json({
-        status: true,
-        message: 'Order created successfully',
-        order: newOrder,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = newOrder;
+      responseObj.httpStatusCode = 201;
+      responseObj.message = 'Order created successfully';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({ error, context: loggerContexts.createOrder });
       next(error);
@@ -84,16 +80,11 @@ class OrderController extends BaseController {
       });
 
       const updatedOrder = await orderServices.updateOrder(req.params.id, req.body);
-
-      if (!updatedOrder) {
-        return res.status(404).json({ message: 'Order not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Order updated successfully',
-        order: updatedOrder,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = updatedOrder || {};
+      responseObj.httpStatusCode = updatedOrder ? 200 : 404;
+      responseObj.message = updatedOrder ? 'Order updated successfully' : 'Order not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({ error, context: loggerContexts.updateOrder });
       next(error);
@@ -105,15 +96,11 @@ class OrderController extends BaseController {
       logger.info({ message: 'Start executing method', context: loggerContexts.deleteOrder });
 
       const deletedOrder = await orderServices.deleteOrder(req.params.id);
-
-      if (!deletedOrder) {
-        return res.status(404).json({ message: 'Order not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Order deleted successfully',
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = deletedOrder || {};
+      responseObj.httpStatusCode = deletedOrder ? 200 : 404;
+      responseObj.message = deletedOrder ? 'Order deleted successfully' : 'Order not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({ error, context: loggerContexts.deleteOrder });
       next(error);

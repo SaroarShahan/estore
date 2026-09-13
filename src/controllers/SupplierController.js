@@ -1,11 +1,14 @@
 const { SupplierServices } = require('../services/SupplierServices');
 const { loggerContexts } = require('../constants/loggerContexts');
 const { logger } = require('../utils');
+const BaseController = require('../utils/BaseController');
+const { ResponseMessage } = require('../utils/ResponseMessage');
 
 const supplierServices = new SupplierServices();
 
-class SupplierController {
+class SupplierController extends BaseController {
   constructor(supplierRepository) {
+    super();
     this.supplierRepository = supplierRepository;
   }
 
@@ -17,12 +20,13 @@ class SupplierController {
       });
 
       const suppliers = await supplierServices.getAllSuppliers(req);
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched all suppliers successfully',
-        data: suppliers,
-      });
+      const responseObj = new ResponseMessage();
+      if (suppliers) {
+        responseObj.data = suppliers;
+        responseObj.httpStatusCode = 200;
+        responseObj.message = 'Fetched all suppliers successfully';
+      }
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -40,16 +44,11 @@ class SupplierController {
       });
 
       const supplier = await supplierServices.getSupplier(req.params.id);
-
-      if (!supplier) {
-        return res.status(404).json({ message: 'Supplier not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched supplier successfully',
-        supplier: supplier,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = supplier || {};
+      responseObj.httpStatusCode = supplier ? 200 : 404;
+      responseObj.message = supplier ? 'Fetched supplier successfully' : 'Supplier not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -72,12 +71,11 @@ class SupplierController {
       });
 
       const newSupplier = await supplierServices.createSupplier(req.body);
-
-      res.status(201).json({
-        status: true,
-        message: 'Supplier created successfully',
-        supplier: newSupplier,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = newSupplier;
+      responseObj.httpStatusCode = 201;
+      responseObj.message = 'Supplier created successfully';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -100,16 +98,13 @@ class SupplierController {
       });
 
       const updatedSupplier = await supplierServices.updateSupplier(req.params.id, req.body);
-
-      if (!updatedSupplier) {
-        return res.status(404).json({ message: 'Supplier not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Supplier updated successfully',
-        supplier: updatedSupplier,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = updatedSupplier || {};
+      responseObj.httpStatusCode = updatedSupplier ? 200 : 404;
+      responseObj.message = updatedSupplier
+        ? 'Supplier updated successfully'
+        : 'Supplier not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -127,15 +122,13 @@ class SupplierController {
       });
 
       const deletedSupplier = await supplierServices.deleteSupplier(req.params.id);
-
-      if (!deletedSupplier) {
-        return res.status(404).json({ message: 'Supplier not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Supplier deleted successfully',
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = deletedSupplier || {};
+      responseObj.httpStatusCode = deletedSupplier ? 200 : 404;
+      responseObj.message = deletedSupplier
+        ? 'Supplier deleted successfully'
+        : 'Supplier not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,

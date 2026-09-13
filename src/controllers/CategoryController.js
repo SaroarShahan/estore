@@ -1,11 +1,14 @@
 const { CategoryServices } = require('../services/CategoryServices');
 const { loggerContexts } = require('../constants/loggerContexts');
 const { logger } = require('../utils');
+const BaseController = require('../utils/BaseController');
+const { ResponseMessage } = require('../utils/ResponseMessage');
 
 const categoryServices = new CategoryServices();
 
-class CategoryController {
+class CategoryController extends BaseController {
   constructor(categoryRepository) {
+    super();
     this.categoryRepository = categoryRepository;
   }
 
@@ -16,13 +19,17 @@ class CategoryController {
         context: loggerContexts.getAllCategories,
       });
 
+      const responseObj = new ResponseMessage();
+
       const categories = await categoryServices.getAllCategories(req);
 
-      res.status(200).json({
-        status: true,
-        message: 'Fetched all categories successfully',
-        data: categories,
-      });
+      if (categories) {
+        responseObj.data = categories;
+        responseObj.httpStatusCode = 200;
+        responseObj.message = 'Fetched all categories successfully';
+
+        super.createResponse.success(res, responseObj);
+      }
     } catch (error) {
       logger.error({
         error,
@@ -38,18 +45,20 @@ class CategoryController {
         message: 'Start executing method',
         context: loggerContexts.getCategory,
       });
+      const responseObj = new ResponseMessage();
 
       const category = await categoryServices.getCategory(req.params.id);
 
       if (!category) {
-        return res.status(404).json({ message: 'Category not found' });
+        responseObj.httpStatusCode = 404;
+        responseObj.message = 'Category not found';
+      } else {
+        responseObj.data = category;
+        responseObj.httpStatusCode = 200;
+        responseObj.message = 'Fetched category successfully';
       }
 
-      res.status(200).json({
-        status: true,
-        message: 'Fetched category successfully',
-        category: category,
-      });
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -72,12 +81,11 @@ class CategoryController {
       });
 
       const newCategory = await categoryServices.createCategory(req.body);
-
-      res.status(201).json({
-        status: true,
-        message: 'Category created successfully',
-        category: newCategory,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = newCategory;
+      responseObj.httpStatusCode = 201;
+      responseObj.message = 'Category created successfully';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -100,16 +108,13 @@ class CategoryController {
       });
 
       const updatedCategory = await categoryServices.updateCategory(req.params.id, req.body);
-
-      if (!updatedCategory) {
-        return res.status(404).json({ message: 'Category not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Category updated successfully',
-        category: updatedCategory,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = updatedCategory || {};
+      responseObj.httpStatusCode = updatedCategory ? 200 : 404;
+      responseObj.message = updatedCategory
+        ? 'Category updated successfully'
+        : 'Category not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -127,15 +132,13 @@ class CategoryController {
       });
 
       const deletedCategory = await categoryServices.deleteCategory(req.params.id);
-
-      if (!deletedCategory) {
-        return res.status(404).json({ message: 'Category not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Category deleted successfully',
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = deletedCategory || {};
+      responseObj.httpStatusCode = deletedCategory ? 200 : 404;
+      responseObj.message = deletedCategory
+        ? 'Category deleted successfully'
+        : 'Category not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,

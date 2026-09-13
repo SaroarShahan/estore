@@ -1,11 +1,14 @@
 const { ProductServices } = require('../services/ProductServices');
 const { loggerContexts } = require('../constants/loggerContexts');
 const { logger } = require('../utils');
+const BaseController = require('../utils/BaseController');
+const { ResponseMessage } = require('../utils/ResponseMessage');
 
 const productServices = new ProductServices();
 
-class ProductController {
+class ProductController extends BaseController {
   constructor(productRepository) {
+    super();
     this.productRepository = productRepository;
   }
 
@@ -17,12 +20,13 @@ class ProductController {
       });
 
       const products = await productServices.getAllProducts(req);
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched all products successfully',
-        data: products,
-      });
+      const responseObj = new ResponseMessage();
+      if (products) {
+        responseObj.data = products;
+        responseObj.httpStatusCode = 200;
+        responseObj.message = 'Fetched all products successfully';
+      }
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -40,16 +44,11 @@ class ProductController {
       });
 
       const product = await productServices.getProduct(req.params.id);
-
-      if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched product successfully',
-        product: product,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = product || {};
+      responseObj.httpStatusCode = product ? 200 : 404;
+      responseObj.message = product ? 'Fetched product successfully' : 'Product not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -72,12 +71,11 @@ class ProductController {
       });
 
       const newProduct = await productServices.createProduct(req.body);
-
-      res.status(201).json({
-        status: true,
-        message: 'Product created successfully',
-        product: newProduct,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = newProduct;
+      responseObj.httpStatusCode = 201;
+      responseObj.message = 'Product created successfully';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -100,16 +98,11 @@ class ProductController {
       });
 
       const updatedProduct = await productServices.updateProduct(req.params.id, req.body);
-
-      if (!updatedProduct) {
-        return res.status(404).json({ message: 'Product not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Product updated successfully',
-        product: updatedProduct,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = updatedProduct || {};
+      responseObj.httpStatusCode = updatedProduct ? 200 : 404;
+      responseObj.message = updatedProduct ? 'Product updated successfully' : 'Product not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -127,15 +120,11 @@ class ProductController {
       });
 
       const deletedProduct = await productServices.deleteProduct(req.params.id);
-
-      if (!deletedProduct) {
-        return res.status(404).json({ message: 'Product not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Product deleted successfully',
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = deletedProduct || {};
+      responseObj.httpStatusCode = deletedProduct ? 200 : 404;
+      responseObj.message = deletedProduct ? 'Product deleted successfully' : 'Product not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,

@@ -1,11 +1,14 @@
 const { UserServices } = require('../services/UserServices');
 const { loggerContexts } = require('../constants/loggerContexts');
 const { logger } = require('../utils');
+const BaseController = require('../utils/BaseController');
+const { ResponseMessage } = require('../utils/ResponseMessage');
 
 const userServices = new UserServices();
 
-class UserController {
+class UserController extends BaseController {
   constructor(userRepository) {
+    super();
     this.userRepository = userRepository;
   }
 
@@ -17,12 +20,13 @@ class UserController {
       });
 
       const users = await userServices.getAllUsers(req);
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched all users successfully',
-        data: users,
-      });
+      const responseObj = new ResponseMessage();
+      if (users) {
+        responseObj.data = users;
+        responseObj.httpStatusCode = 200;
+        responseObj.message = 'Fetched all users successfully';
+        super.createResponse.success(res, responseObj);
+      }
     } catch (error) {
       logger.error({
         error,
@@ -40,16 +44,16 @@ class UserController {
       });
 
       const user = await userServices.getUser(req.params.id);
-
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+      const responseObj = new ResponseMessage();
+      if (user) {
+        responseObj.data = user;
+        responseObj.httpStatusCode = 200;
+        responseObj.message = 'Fetched user successfully';
+      } else {
+        responseObj.httpStatusCode = 404;
+        responseObj.message = 'User not found';
       }
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched user successfully',
-        user: user,
-      });
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -72,12 +76,11 @@ class UserController {
       });
 
       const newUser = await userServices.createUser(req.body);
-
-      res.status(201).json({
-        status: true,
-        message: 'User created successfully',
-        user: newUser,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = newUser;
+      responseObj.httpStatusCode = 201;
+      responseObj.message = 'User created successfully';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -100,16 +103,11 @@ class UserController {
       });
 
       const updatedUser = await userServices.updateUser(req.params.id, req.body);
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'User updated successfully',
-        user: updatedUser,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = updatedUser || {};
+      responseObj.httpStatusCode = updatedUser ? 200 : 404;
+      responseObj.message = updatedUser ? 'User updated successfully' : 'User not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -127,15 +125,11 @@ class UserController {
       });
 
       const deletedUser = await userServices.deleteUser(req.params.id);
-
-      if (!deletedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'User deleted successfully',
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = deletedUser || {};
+      responseObj.httpStatusCode = deletedUser ? 200 : 404;
+      responseObj.message = deletedUser ? 'User deleted successfully' : 'User not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,

@@ -2,6 +2,7 @@ const { CustomerServices } = require('../services/CustomerServices');
 const { loggerContexts } = require('../constants/loggerContexts');
 const { logger } = require('../utils');
 const BaseController = require('../utils/BaseController');
+const { ResponseMessage } = require('../utils/ResponseMessage');
 
 const customerServices = new CustomerServices();
 
@@ -19,12 +20,13 @@ class CustomerController extends BaseController {
       });
 
       const customers = await customerServices.getAllCustomers(req);
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched all customers successfully',
-        data: customers,
-      });
+      const responseObj = new ResponseMessage();
+      if (customers) {
+        responseObj.data = customers;
+        responseObj.httpStatusCode = 200;
+        responseObj.message = 'Fetched all customers successfully';
+      }
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -42,16 +44,11 @@ class CustomerController extends BaseController {
       });
 
       const customer = await customerServices.getCustomer(req.params.id);
-
-      if (!customer) {
-        return res.status(404).json({ message: 'Customer not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Fetched customer successfully',
-        customer,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = customer || {};
+      responseObj.httpStatusCode = customer ? 200 : 404;
+      responseObj.message = customer ? 'Fetched customer successfully' : 'Customer not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -74,12 +71,11 @@ class CustomerController extends BaseController {
       });
 
       const newCustomer = await customerServices.createCustomer(req.body);
-
-      res.status(201).json({
-        status: true,
-        message: 'Customer created successfully',
-        customer: newCustomer,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = newCustomer;
+      responseObj.httpStatusCode = 201;
+      responseObj.message = 'Customer created successfully';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -102,16 +98,13 @@ class CustomerController extends BaseController {
       });
 
       const updatedCustomer = await customerServices.updateCustomer(req.params.id, req.body);
-
-      if (!updatedCustomer) {
-        return res.status(404).json({ message: 'Customer not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Customer updated successfully',
-        customer: updatedCustomer,
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = updatedCustomer || {};
+      responseObj.httpStatusCode = updatedCustomer ? 200 : 404;
+      responseObj.message = updatedCustomer
+        ? 'Customer updated successfully'
+        : 'Customer not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
@@ -129,15 +122,13 @@ class CustomerController extends BaseController {
       });
 
       const deletedCustomer = await customerServices.deleteCustomer(req.params.id);
-
-      if (!deletedCustomer) {
-        return res.status(404).json({ message: 'Customer not found' });
-      }
-
-      res.status(200).json({
-        status: true,
-        message: 'Customer deleted successfully',
-      });
+      const responseObj = new ResponseMessage();
+      responseObj.data = deletedCustomer || {};
+      responseObj.httpStatusCode = deletedCustomer ? 200 : 404;
+      responseObj.message = deletedCustomer
+        ? 'Customer deleted successfully'
+        : 'Customer not found';
+      super.createResponse.success(res, responseObj);
     } catch (error) {
       logger.error({
         error,
