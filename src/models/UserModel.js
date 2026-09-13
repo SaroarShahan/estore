@@ -1,7 +1,14 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class UserModel extends Model {}
+  class UserModel extends Model {
+    static associate(models) {
+      models.UserModel.belongsTo(models.RoleModel, {
+        foreignKey: 'roleId',
+        as: 'role',
+      });
+    }
+  }
 
   UserModel.init(
     {
@@ -23,6 +30,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         field: 'username',
       },
+      gender: {
+        type: DataTypes.ENUM('male', 'female', 'other'),
+        field: 'gender',
+        allowNull: false,
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -39,6 +51,17 @@ module.exports = (sequelize, DataTypes) => {
       status: {
         type: DataTypes.ENUM('active', 'inactive', 'blocked'),
         defaultValue: 'active',
+      },
+      roleId: {
+        type: DataTypes.BIGINT.UNSIGNED,
+        field: 'role_id',
+        allowNull: true,
+        references: {
+          model: 'roles',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
     },
     {
