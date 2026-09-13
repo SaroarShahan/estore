@@ -7,7 +7,9 @@ architecture with routes, controllers, services, repositories, and Sequelize mod
 
 - Express 5 API server with a health check
 - CRUD endpoints for users, categories, products, suppliers, customers, and orders
+- JWT authentication and role-based permission checks
 - Product, customer, and order filtering with pagination and sorting
+- Zod request validation for models and authentication
 - PostgreSQL persistence through Sequelize
 - Migrations, seeders, and model-generation scripts
 - Shared response and exception-handling middleware

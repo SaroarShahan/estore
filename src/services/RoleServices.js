@@ -1,0 +1,158 @@
+const { Op } = require('sequelize');
+const { PermissionModel, UserModel, sequelize } = require('../models');
+const { RoleRepository } = require('../repository/RoleRepository');
+const { limitAndOffsetBuilder } = require('../utils');
+
+const roleInclude = [
+  {
+    model: PermissionModel,
+    as: 'permissions',
+    attributes: ['id', 'name', 'label', 'module'],
+    through: { attributes: [] },
+  },
+];
+
+class RoleServices {
+  constructor() {
+    if (RoleServices.instance) return RoleServices.instance;
+
+    this.roleRepository = new RoleRepository();
+    RoleServices.instance = this;
+  }
+
+  async getAllRoles(req) {
+    const options = {};
+    const { page } = req.query;
+    const { limit, offset } = limitAndOffsetBuilder(req.query);
+
+    if (req.query.search) {
+      options.where = {
+        name: { [Op.iLike]: `%${req.query.search}%` },
+      };
+    }
+
+    if (req.query.sortBy && req.query.orderBy) {
+      options.order = [[req.query.sortBy, req.query.orderBy.toUpperCase()]];
+    }
+
+    const { rows, count } = await this.roleRepository.findAndCountAll({
+      include: roleInclude,
+      where: options.where || {},
+      limit,
+      offset,
+      order: options.order || [['id', 'DESC']],
+      distinct: true,
+    });
+
+    return {
+      totalCount: count,
+      roles: rows,
+      page: page ? +page : 1,
+      limit: limit ? +limit : count,
+      totalPage: limit ? Math.ceil(count / +limit) : 1,
+    };
+  }
+
+  async getRole(id) {
+    return this.roleRepository.findById(id, { include: roleInclude });
+  }
+
+  async getValidPermissions(permissionIds, transaction) {
+    const uniquePermissionIds = [...new Set(permissionIds)];
+    const permissions = await PermissionModel.findAll({
+      where: { id: uniquePermissionIds },
+      transaction,
+    });
+
+    return { permissions, uniquePermissionIds };
+  }
+
+  async createRole(data) {
+    const transaction = await sequelize.transaction();
+
+    try {
+      const { permissions, uniquePermissionIds } = await this.getValidPermissions(
+        data.permissions,
+        transaction,
+      );
+
+      if (permissions.length !== uniquePermissionIds.length) {
+        const error = new Error('One or more permissions are invalid');
+        error.httpStatusCode = 400;
+        await transaction.rollback();
+        throw error;
+      }
+
+      const role = await this.roleRepository.create(
+        { name: data.name, permissionIds: uniquePermissionIds },
+        { transaction },
+      );
+      await role.setPermissions(permissions, { transaction });
+      await transaction.commit();
+
+      return this.getRole(role.id);
+    } catch (error) {
+      if (!transaction.finished) await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async updateRole(id, data) {
+    const role = await this.roleRepository.findById(id);
+
+    if (!role) return null;
+
+    const transaction = await sequelize.transaction();
+
+    try {
+      let permissionIds = role.permissionIds;
+      let permissions;
+
+      if (typeof data.permissions !== 'undefined') {
+        const permissionResult = await this.getValidPermissions(data.permissions, transaction);
+        permissions = permissionResult.permissions;
+        permissionIds = permissionResult.uniquePermissionIds;
+
+        if (permissions.length !== permissionIds.length) {
+          const error = new Error('One or more permissions are invalid');
+          error.httpStatusCode = 400;
+          await transaction.rollback();
+          throw error;
+        }
+      }
+
+      await role.update({ name: data.name, permissionIds }, { transaction });
+
+      if (permissions) {
+        await role.setPermissions(permissions, { transaction });
+      }
+
+      await transaction.commit();
+      return this.getRole(id);
+    } catch (error) {
+      if (!transaction.finished) await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async deleteRole(id) {
+    const role = await this.roleRepository.findById(id);
+
+    if (!role) return { role: null };
+
+    const usersCount = await UserModel.count({ where: { roleId: id } });
+
+    if (usersCount > 0) {
+      const error = new Error(
+        `Cannot delete role: It is currently assigned to ${usersCount} ${usersCount === 1 ? 'user' : 'users'}.`,
+      );
+      error.httpStatusCode = 400;
+      throw error;
+    }
+
+    await this.roleRepository.delete(id);
+    return { role };
+  }
+}
+
+module.exports = { RoleServices };

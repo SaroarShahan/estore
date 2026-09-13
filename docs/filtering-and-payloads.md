@@ -42,6 +42,31 @@ GET /api/v1/orders?customerId=1&page=2&limit=20&sortBy=created_at&orderBy=desc
 
 ## Payloads
 
+### Authentication
+
+Register:
+
+```json
+{
+  "username": "saroar",
+  "email": "saroar@example.com",
+  "password": "secret123",
+  "gender": "male",
+  "roleId": 3
+}
+```
+
+Login:
+
+```json
+{
+  "email": "saroar@example.com",
+  "password": "secret123"
+}
+```
+
+Passwords must be at least eight characters. Registration requires an existing role.
+
 Customer:
 
 ```json
@@ -96,3 +121,10 @@ User:
 ```
 
 User status can be `active`, `inactive`, or `blocked`.
+
+## Validation
+
+Request bodies, route IDs, and list query parameters are validated with Zod. Unknown fields are
+rejected from request bodies. IDs must be positive integers, prices and quantities cannot be
+negative, email fields must be valid email addresses, and enum fields only accept their documented
+values.

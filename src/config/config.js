@@ -9,5 +9,7 @@ module.exports = {
     port: Number(process.env.DB_PORT),
     dialect: process.env.DB_DIALECT,
     logging: console.log,
+    jwtSecret: process.env.JWT_SECRET,
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
 };

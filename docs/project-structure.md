@@ -10,11 +10,17 @@
 │   ├── constants/
 │   ├── controllers/
 │   ├── middlewares/
+│   │   ├── auth.js
+│   │   ├── authorize.js
+│   │   ├── ExceptionHandling.js
+│   │   ├── ResourcesNotFound.js
+│   │   └── validate.js
 │   ├── models/
 │   ├── repository/
 │   ├── routes/
 │   ├── services/
-│   └── utils/
+│   ├── utils/
+│   └── validations/
 ├── migrations/
 ├── seeders/
 ├── docs/
@@ -32,4 +38,5 @@ The application follows a layered structure:
 - **Repositories** provide the persistence boundary for Sequelize models.
 - **Models** define database fields and associations.
 - **Middlewares** handle JSON parsing, not-found requests, and exceptions.
+- **Validation** modules define Zod schemas for request bodies, route parameters, and query strings.
 - **Utils** contain shared response, logging, and pagination helpers.

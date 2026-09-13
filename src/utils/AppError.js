@@ -1,6 +1,6 @@
 const { httpStatus } = require('./../constants/HttpStatusCode');
 
-export default class AppError extends Error {
+class AppError extends Error {
   isOperational;
   message;
   errorSource;
@@ -22,3 +22,5 @@ export default class AppError extends Error {
     this.additionalData = additionalData;
   }
 }
+
+module.exports = { AppError };

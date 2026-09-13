@@ -28,7 +28,12 @@ DB_HOST=localhost
 DB_DIALECT=postgres
 DB_PORT=5432
 PORT=8080
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_EXPIRES_IN=7d
 ```
+
+`JWT_SECRET` is required for token generation and verification. Keep it private and use a strong
+random value outside local development.
 
 ## Run
 

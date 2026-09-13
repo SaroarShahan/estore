@@ -7,7 +7,9 @@ Runtime database settings are loaded from:
 
 Models use underscored database columns. For example, JavaScript fields such as `firstName`, `productImage`, and `isActive` map to `first_name`, `product_image`, and `is_active`.
 
-Users, products, suppliers, customers, orders, and order items use Sequelize `paranoid`; deletes set `deleted_at` instead of immediately removing rows.
+Users, products, suppliers, customers, orders, and order items use Sequelize `paranoid`; deletes
+set `deleted_at` instead of immediately removing rows. Roles and permissions are connected through
+the `role_permissions` join table.
 
 ## Commands
 

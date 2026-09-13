@@ -33,6 +33,18 @@ const loggerContexts = {
   createOrder: 'OrderController.createOrder',
   updateOrder: 'OrderController.updateOrder',
   deleteOrder: 'OrderController.deleteOrder',
+  getAllRoles: 'RoleController.getAllRoles',
+  getRole: 'RoleController.getRole',
+  createRole: 'RoleController.createRole',
+  updateRole: 'RoleController.updateRole',
+  deleteRole: 'RoleController.deleteRole',
+  getAllPermissions: 'PermissionController.getAllPermissions',
+  getPermission: 'PermissionController.getPermission',
+  createPermission: 'PermissionController.createPermission',
+  updatePermission: 'PermissionController.updatePermission',
+  deletePermission: 'PermissionController.deletePermission',
+  register: 'AuthController.register',
+  login: 'AuthController.login',
 };
 
 module.exports = { loggerContexts };
