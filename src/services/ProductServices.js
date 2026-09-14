@@ -1,7 +1,4 @@
-const { Op } = require('sequelize');
-const { ProductRepository } = require('../repository/ProductRepository');
-const { limitAndOffsetBuilder } = require('./../utils');
-const { SupplierModel, CategoryModel } = require('../models');
+const { ProductRepository } = require('../repository/Product/ProductRepository');
 
 class ProductServices {
   constructor() {
@@ -12,59 +9,8 @@ class ProductServices {
   }
 
   async getAllProducts(req) {
-    const options = {};
-    const { page, minPrice, maxPrice } = req.query;
-    const { limit, offset } = limitAndOffsetBuilder(req.query);
-
-    if (req.query.categoryId) {
-      options.where = { ...options.where, categoryId: req.query.categoryId };
-    }
-
-    if (req.query.supplierId) {
-      options.where = { ...options.where, supplierId: req.query.supplierId };
-    }
-
-    if (minPrice || maxPrice) {
-      options.where = {
-        ...options.where,
-        price: {
-          ...(minPrice && { [Op.gte]: minPrice }),
-          ...(maxPrice && { [Op.lte]: maxPrice }),
-        },
-      };
-    }
-
-    if (req.query.sortBy && req.query.orderBy) {
-      const field = req.query.sortBy;
-      const order = req.query.orderBy;
-      options.order = [[field, order.toUpperCase()]];
-    }
-
-    if (typeof req.query.isActive !== 'undefined') {
-      options.where = { ...options.where, isActive: req.query.isActive === 'true' };
-    }
-
-    if (req.query.search) {
-      const searchTerm = req.query.search;
-      options.where = {
-        ...options.where,
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${searchTerm}%` } },
-          { sku: { [Op.iLike]: `%${searchTerm}%` } },
-        ],
-      };
-    }
-
-    const { rows, count } = await this.productRepository.findAndCountAll({
-      include: [
-        { model: SupplierModel, as: 'supplier', attributes: ['id', 'name'] },
-        { model: CategoryModel, as: 'category', attributes: ['id', 'name'] },
-      ],
-      where: options.where || {},
-      limit,
-      offset,
-      order: options.order || [['created_at', 'desc']],
-    });
+    const { page } = req.query;
+    const { rows, count, limit } = await this.productRepository.findAndCountAllProducts(req.query);
 
     return {
       totalCount: count,
