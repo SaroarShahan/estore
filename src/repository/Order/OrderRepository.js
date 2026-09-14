@@ -1,4 +1,5 @@
-const { OrderModel } = require('../models');
+const { CustomerModel, OrderItemModel, OrderModel } = require('../../models');
+const { buildOrderQuery } = require('./orderQueryBuilder');
 
 class OrderRepository {
   constructor() {
@@ -13,6 +14,21 @@ class OrderRepository {
 
   async findAndCountAll(options) {
     return OrderModel.findAndCountAll(options);
+  }
+
+  async findAndCountAllOrders(query) {
+    const options = buildOrderQuery(query);
+    return {
+      ...(await OrderModel.findAndCountAll({
+        ...options,
+        include: [
+          { model: CustomerModel, as: 'customer', attributes: ['id', 'name', 'email'] },
+          { model: OrderItemModel, as: 'items' },
+        ],
+        distinct: true,
+      })),
+      limit: options.limit,
+    };
   }
 
   async findById(id) {

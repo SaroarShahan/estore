@@ -1,4 +1,5 @@
-const { CategoryModel } = require('../models');
+const { CategoryModel } = require('../../models');
+const { buildCategoryQuery } = require('./categoryQueryBuilder');
 
 class CategoryRepository {
   constructor() {
@@ -13,6 +14,11 @@ class CategoryRepository {
 
   async findAndCountAll(options) {
     return CategoryModel.findAndCountAll(options);
+  }
+
+  async findAndCountAllCategories(query) {
+    const options = buildCategoryQuery(query);
+    return { ...(await CategoryModel.findAndCountAll(options)), limit: options.limit };
   }
 
   async findById(id) {

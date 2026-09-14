@@ -1,5 +1,4 @@
-const { CategoryRepository } = require('../repository/CategoryRepository');
-const { limitAndOffsetBuilder } = require('./../utils');
+const { CategoryRepository } = require('../repository/Category/CategoryRepository');
 
 class CategoryServices {
   constructor() {
@@ -10,22 +9,10 @@ class CategoryServices {
   }
 
   async getAllCategories(req) {
-    const options = {};
     const { page } = req.query;
-    const { limit, offset } = limitAndOffsetBuilder(req.query);
-
-    if (req.query.sortBy && req.query.orderBy) {
-      const field = req.query.sortBy;
-      const order = req.query.orderBy;
-      options.order = [[field, order.toUpperCase()]];
-    }
-
-    const { rows, count } = await this.categoryRepository.findAndCountAll({
-      where: options.where || {},
-      limit,
-      offset,
-      order: options.order || [['created_at', 'desc']],
-    });
+    const { rows, count, limit } = await this.categoryRepository.findAndCountAllCategories(
+      req.query,
+    );
 
     return {
       totalCount: count,

@@ -1,4 +1,5 @@
-const { UserModel } = require('../models');
+const { UserModel } = require('../../models');
+const { buildUserQuery } = require('./userQueryBuilder');
 
 class UserRepository {
   constructor() {
@@ -13,6 +14,11 @@ class UserRepository {
 
   async findAndCountAll(options) {
     return UserModel.findAndCountAll(options);
+  }
+
+  async findAndCountAllUsers(query) {
+    const options = buildUserQuery(query);
+    return { ...(await UserModel.findAndCountAll(options)), limit: options.limit };
   }
 
   async findById(id) {

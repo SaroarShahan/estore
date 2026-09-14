@@ -1,4 +1,5 @@
-const { SupplierModel } = require('../models');
+const { SupplierModel } = require('../../models');
+const { buildSupplierQuery } = require('./supplierQueryBuilder');
 
 class SupplierRepository {
   constructor() {
@@ -13,6 +14,11 @@ class SupplierRepository {
 
   async findAndCountAll(options) {
     return SupplierModel.findAndCountAll(options);
+  }
+
+  async findAndCountAllSuppliers(query) {
+    const options = buildSupplierQuery(query);
+    return { ...(await SupplierModel.findAndCountAll(options)), limit: options.limit };
   }
 
   async findById(id) {

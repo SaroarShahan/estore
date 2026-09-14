@@ -1,7 +1,4 @@
-const { Op } = require('sequelize');
-const { CustomerRepository } = require('../repository/CustomerRepository');
-const { limitAndOffsetBuilder } = require('./../utils');
-const { OrderModel, OrderItemModel, ProductModel, CategoryModel } = require('../models');
+const { CustomerRepository } = require('../repository/Customer/CustomerRepository');
 
 class CustomerServices {
   constructor() {
@@ -12,67 +9,10 @@ class CustomerServices {
   }
 
   async getAllCustomers(req) {
-    const options = {};
     const { page } = req.query;
-    const { limit, offset } = limitAndOffsetBuilder(req.query);
-
-    if (req.query.search) {
-      const searchTerm = req.query.search;
-
-      options.where = {
-        ...options.where,
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${searchTerm}%` } },
-          { email: { [Op.iLike]: `%${searchTerm}%` } },
-          { phone: { [Op.iLike]: `%${searchTerm}%` } },
-        ],
-      };
-    }
-
-    if (req.query.sortBy && req.query.orderBy) {
-      const field = req.query.sortBy;
-      const order = req.query.orderBy;
-      options.order = [[field, order.toUpperCase()]];
-    }
-
-    const { rows, count } = await this.customerRepository.findAndCountAll({
-      attributes: ['id', 'name', 'email', 'phone', 'address'],
-      include: [
-        {
-          model: OrderModel,
-          as: 'orders',
-          attributes: ['id', 'totalAmount', 'status', 'createdAt'],
-          include: [
-            {
-              model: OrderItemModel,
-              as: 'items',
-              attributes: ['id', 'quantity', 'unitPrice', 'subtotal'],
-              include: [
-                {
-                  model: ProductModel,
-                  as: 'product',
-                  attributes: ['id', 'name', 'sku', 'price'],
-                  include: [
-                    {
-                      model: CategoryModel,
-                      as: 'category',
-                      attributes: ['id', 'name'],
-                      where: {
-                        name: 'Electronics',
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      where: options.where || {},
-      limit,
-      offset,
-      order: options.order || [['created_at', 'desc']],
-    });
+    const { rows, count, limit } = await this.customerRepository.findAndCountAllCustomers(
+      req.query,
+    );
 
     return {
       totalCount: count,

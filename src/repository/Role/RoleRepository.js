@@ -1,4 +1,5 @@
-const { RoleModel } = require('../models');
+const { PermissionModel, RoleModel } = require('../../models');
+const { buildRoleQuery } = require('./roleQueryBuilder');
 
 class RoleRepository {
   constructor() {
@@ -13,6 +14,25 @@ class RoleRepository {
 
   async findAndCountAll(options) {
     return RoleModel.findAndCountAll(options);
+  }
+
+  async findAndCountAllRoles(query) {
+    const options = buildRoleQuery(query);
+    return {
+      ...(await RoleModel.findAndCountAll({
+        ...options,
+        include: [
+          {
+            model: PermissionModel,
+            as: 'permissions',
+            attributes: ['id', 'name', 'label', 'module'],
+            through: { attributes: [] },
+          },
+        ],
+        distinct: true,
+      })),
+      limit: options.limit,
+    };
   }
 
   async findById(id, options = {}) {

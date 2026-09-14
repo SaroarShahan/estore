@@ -1,4 +1,5 @@
-const { PermissionModel } = require('../models');
+const { PermissionModel } = require('../../models');
+const { buildPermissionQuery } = require('./permissionQueryBuilder');
 
 class PermissionRepository {
   constructor() {
@@ -13,6 +14,17 @@ class PermissionRepository {
 
   async findAndCountAll(options) {
     return PermissionModel.findAndCountAll(options);
+  }
+
+  async findAndCountAllPermissions(query) {
+    const options = buildPermissionQuery(query);
+    return {
+      ...(await PermissionModel.findAndCountAll({
+        ...options,
+        attributes: ['id', 'name', 'label', 'module'],
+      })),
+      limit: options.limit,
+    };
   }
 
   async findById(id) {

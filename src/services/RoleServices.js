@@ -1,7 +1,5 @@
-const { Op } = require('sequelize');
 const { PermissionModel, UserModel, sequelize } = require('../models');
-const { RoleRepository } = require('../repository/RoleRepository');
-const { limitAndOffsetBuilder } = require('../utils');
+const { RoleRepository } = require('../repository/Role/RoleRepository');
 
 const roleInclude = [
   {
@@ -21,28 +19,8 @@ class RoleServices {
   }
 
   async getAllRoles(req) {
-    const options = {};
     const { page } = req.query;
-    const { limit, offset } = limitAndOffsetBuilder(req.query);
-
-    if (req.query.search) {
-      options.where = {
-        name: { [Op.iLike]: `%${req.query.search}%` },
-      };
-    }
-
-    if (req.query.sortBy && req.query.orderBy) {
-      options.order = [[req.query.sortBy, req.query.orderBy.toUpperCase()]];
-    }
-
-    const { rows, count } = await this.roleRepository.findAndCountAll({
-      include: roleInclude,
-      where: options.where || {},
-      limit,
-      offset,
-      order: options.order || [['id', 'DESC']],
-      distinct: true,
-    });
+    const { rows, count, limit } = await this.roleRepository.findAndCountAllRoles(req.query);
 
     return {
       totalCount: count,

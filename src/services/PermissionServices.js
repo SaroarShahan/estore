@@ -1,7 +1,5 @@
-const { Op } = require('sequelize');
 const { PermissionModel, RolePermissionModel } = require('../models');
-const { PermissionRepository } = require('../repository/PermissionRepository');
-const { limitAndOffsetBuilder } = require('../utils');
+const { PermissionRepository } = require('../repository/Permission/PermissionRepository');
 
 class PermissionServices {
   constructor() {
@@ -12,36 +10,10 @@ class PermissionServices {
   }
 
   async getAllPermissions(req) {
-    const options = {};
     const { page } = req.query;
-    const { limit, offset } = limitAndOffsetBuilder(req.query);
-
-    if (req.query.module) {
-      options.where = { ...options.where, module: req.query.module };
-    }
-
-    if (req.query.search) {
-      options.where = {
-        ...options.where,
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${req.query.search}%` } },
-          { label: { [Op.iLike]: `%${req.query.search}%` } },
-          { module: { [Op.iLike]: `%${req.query.search}%` } },
-        ],
-      };
-    }
-
-    if (req.query.sortBy && req.query.orderBy) {
-      options.order = [[req.query.sortBy, req.query.orderBy.toUpperCase()]];
-    }
-
-    const { rows, count } = await this.permissionRepository.findAndCountAll({
-      attributes: ['id', 'name', 'label', 'module'],
-      where: options.where || {},
-      limit,
-      offset,
-      order: options.order || [['module', 'ASC'], ['id', 'DESC']],
-    });
+    const { rows, count, limit } = await this.permissionRepository.findAndCountAllPermissions(
+      req.query,
+    );
 
     return {
       totalCount: count,

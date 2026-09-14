@@ -1,5 +1,4 @@
-const { SupplierRepository } = require('../repository/SupplierRepository');
-const { limitAndOffsetBuilder } = require('./../utils');
+const { SupplierRepository } = require('../repository/Supplier/SupplierRepository');
 
 class SupplierServices {
   constructor() {
@@ -10,26 +9,10 @@ class SupplierServices {
   }
 
   async getAllSuppliers(req) {
-    const options = {};
     const { page } = req.query;
-    const { limit, offset } = limitAndOffsetBuilder(req.query);
-
-    if (req.query.sortBy && req.query.orderBy) {
-      const field = req.query.sortBy;
-      const order = req.query.orderBy;
-      options.order = [[field, order.toUpperCase()]];
-    }
-
-    if (typeof req.query.isActive !== 'undefined') {
-      options.where = { ...options.where, isActive: req.query.isActive === 'true' };
-    }
-
-    const { rows, count } = await this.supplierRepository.findAndCountAll({
-      where: options.where || {},
-      limit,
-      offset,
-      order: options.order || [['created_at', 'desc']],
-    });
+    const { rows, count, limit } = await this.supplierRepository.findAndCountAllSuppliers(
+      req.query,
+    );
 
     return {
       totalCount: count,

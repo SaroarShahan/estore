@@ -1,4 +1,5 @@
-const { CustomerModel } = require('../models');
+const { CustomerModel } = require('../../models');
+const { buildCustomerQuery } = require('./customerQueryBuilder');
 
 class CustomerRepository {
   constructor() {
@@ -11,8 +12,13 @@ class CustomerRepository {
     return CustomerModel.create(data);
   }
 
-  async findAndCountAll(options) {
-    return CustomerModel.findAndCountAll(options);
+  async findAndCountAllCustomers(query) {
+    const options = buildCustomerQuery(query);
+
+    return {
+      ...(await CustomerModel.findAndCountAll(options)),
+      limit: options.limit,
+    };
   }
 
   async findById(id) {

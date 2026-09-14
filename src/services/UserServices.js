@@ -1,5 +1,4 @@
-const { UserRepository } = require('../repository/UserRepository');
-const { limitAndOffsetBuilder } = require('./../utils');
+const { UserRepository } = require('../repository/User/UserRepository');
 
 class UserServices {
   constructor() {
@@ -10,26 +9,8 @@ class UserServices {
   }
 
   async getAllUsers(req) {
-    const options = {};
     const { page } = req.query;
-    const { limit, offset } = limitAndOffsetBuilder(req.query);
-
-    if (req.query.status) {
-      options.where = { ...options.where, status: req.query.status };
-    }
-
-    if (req.query.sortBy && req.query.orderBy) {
-      const field = req.query.sortBy;
-      const order = req.query.orderBy;
-      options.order = [[field, order.toUpperCase()]];
-    }
-
-    const { rows, count } = await this.userRepository.findAndCountAll({
-      where: options.where || {},
-      limit,
-      offset,
-      order: options.order || [['created_at', 'desc']],
-    });
+    const { rows, count, limit } = await this.userRepository.findAndCountAllUsers(req.query);
 
     return {
       totalCount: count,
